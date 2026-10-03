@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha IA - Gemini Free</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:#fff;margin:0;padding:20px}
+.container{max-width:700px;margin:0 auto}
+#chat{background:#1e293b;border-radius:12px;padding:20px;min-height:300px;margin:20px 0;white-space:pre-wrap}
+.row{display:flex;gap:10px}
+input{flex:1;padding:12px;border-radius:8px;border:none;font-size:16px}
+button{padding:12px 24px;border-radius:8px;border:none;background:#22c55e;color:#fff;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🤖 Minha IA (Gemini Free)</h1>
+<div id="chat">Digite algo abaixo para começar...</div>
+<div class="row">
+<input id="prompt" placeholder="Pergunte qualquer coisa..." onkeydown="if(event.key==='Enter')enviar()">
+<button id="btn" onclick="enviar()">Enviar</button>
+</div>
+</div>
+<script>
+async function enviar(){
+  const prompt = document.getElementById('prompt').value;
+  if(!prompt) return;
+  const btn = document.getElementById('btn');
+  const chat = document.getElementById('chat');
+  btn.disabled = true;
+  chat.innerHTML += '\n\n**Você:** '+prompt+'\n**IA:** pensando...';
+  try{
+    const r = await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt})
+    });
+    const d = await r.json();
+    chat.innerHTML = chat.innerHTML.replace('pensando...', (d.resposta || d.error));
+  }catch(e){ chat.innerHTML += ' Erro: '+e.message; }
+  document.getElementById('prompt').value='';
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
